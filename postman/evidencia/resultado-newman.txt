@@ -1,0 +1,75 @@
+newman
+
+API de solicitudes de soporte técnico
+
+→ Registrar solicitud
+  POST http://localhost:8080/api/solicitudes [201 Created, 487B, 49ms]
+  ✓  HTTP 201
+  ✓  Devuelve ID, estado y encabezado Location
+
+→ Listar solicitudes
+  GET http://localhost:8080/api/solicitudes [200 OK, 433B, 6ms]
+  ✓  HTTP 200
+  ✓  La lista contiene la solicitud creada
+
+→ Consultar por ID
+  GET http://localhost:8080/api/solicitudes/2 [200 OK, 431B, 4ms]
+  ✓  HTTP 200
+  ✓  Coincide el ID
+
+→ Actualizar y asignar técnico
+  PUT http://localhost:8080/api/solicitudes/2 [200 OK, 480B, 4ms]
+  ✓  HTTP 200
+  ✓  Actualiza el estado y conserva ID y fecha
+
+→ Rechazar título vacío y correo inválido
+  POST http://localhost:8080/api/solicitudes [400 Bad Request, 291B, 5ms]
+  ✓  HTTP 400
+  ✓  Identifica ambos campos inválidos
+
+→ Rechazar estado desconocido
+  PUT http://localhost:8080/api/solicitudes/2 [400 Bad Request, 252B, 5ms]
+  ✓  HTTP 400
+  ✓  La respuesta tiene un mensaje
+
+→ Eliminar solicitud
+  DELETE http://localhost:8080/api/solicitudes/2 [204 No Content, 112B, 4ms]
+  ✓  HTTP 204
+  ✓  La respuesta no tiene cuerpo
+
+→ Consultar solicitud eliminada
+  GET http://localhost:8080/api/solicitudes/2 [404 Not Found, 242B, 4ms]
+  ✓  HTTP 404
+  ✓  El error identifica el ID
+
+→ Actualizar solicitud eliminada
+  PUT http://localhost:8080/api/solicitudes/2 [404 Not Found, 242B, 5ms]
+  ✓  HTTP 404
+
+→ Eliminar solicitud ya eliminada
+  DELETE http://localhost:8080/api/solicitudes/2 [404 Not Found, 242B, 3ms]
+  ✓  HTTP 404
+
+→ Rechazar identificador no numérico
+  GET http://localhost:8080/api/solicitudes/abc [400 Bad Request, 226B, 3ms]
+  ✓  HTTP 400
+
+┌─────────────────────────┬──────────────────┬─────────────────┐
+│                         │         executed │          failed │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│              iterations │                1 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│                requests │               11 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│            test-scripts │               11 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│      prerequest-scripts │                0 │               0 │
+├─────────────────────────┼──────────────────┼─────────────────┤
+│              assertions │               19 │               0 │
+├─────────────────────────┴──────────────────┴─────────────────┤
+│ total run duration: 251ms                                    │
+├──────────────────────────────────────────────────────────────┤
+│ total data received: 1.67kB (approx)                         │
+├──────────────────────────────────────────────────────────────┤
+│ average response time: 8ms [min: 3ms, max: 49ms, s.d.: 12ms] │
+└──────────────────────────────────────────────────────────────┘

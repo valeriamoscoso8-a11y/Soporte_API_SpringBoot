@@ -1,0 +1,166 @@
+[
+  {
+    "nombre": "Registrar solicitud",
+    "metodo": "POST",
+    "url": "http://127.0.0.1:8080/api/solicitudes",
+    "estado": 201,
+    "respuesta": {
+      "id": 1,
+      "titulo": "Impresora sin conexión",
+      "descripcion": "El equipo de recepción no puede imprimir desde esta mañana.",
+      "cliente": {
+        "nombre": "Ana Pérez",
+        "correo": "ana@example.com"
+      },
+      "tecnico": null,
+      "estado": "PENDIENTE",
+      "fechaCreacion": "2026-11-21T01:21:17.710789151Z"
+    },
+    "location": "http://127.0.0.1:8080/api/solicitudes/1"
+  },
+  {
+    "nombre": "Listar solicitudes",
+    "metodo": "GET",
+    "url": "http://127.0.0.1:8080/api/solicitudes",
+    "estado": 200,
+    "respuesta": [
+      {
+        "id": 1,
+        "titulo": "Impresora sin conexión",
+        "descripcion": "El equipo de recepción no puede imprimir desde esta mañana.",
+        "cliente": {
+          "nombre": "Ana Pérez",
+          "correo": "ana@example.com"
+        },
+        "tecnico": null,
+        "estado": "PENDIENTE",
+        "fechaCreacion": "2026-11-21T01:21:17.710789151Z"
+      }
+    ],
+    "location": null
+  },
+  {
+    "nombre": "Consultar por ID",
+    "metodo": "GET",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 200,
+    "respuesta": {
+      "id": 1,
+      "titulo": "Impresora sin conexión",
+      "descripcion": "El equipo de recepción no puede imprimir desde esta mañana.",
+      "cliente": {
+        "nombre": "Ana Pérez",
+        "correo": "ana@example.com"
+      },
+      "tecnico": null,
+      "estado": "PENDIENTE",
+      "fechaCreacion": "2026-11-21T01:21:17.710789151Z"
+    },
+    "location": null
+  },
+  {
+    "nombre": "Actualizar y asignar técnico",
+    "metodo": "PUT",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 200,
+    "respuesta": {
+      "id": 1,
+      "titulo": "Impresora sin conexión",
+      "descripcion": "El equipo de recepción no puede imprimir desde esta mañana.",
+      "cliente": {
+        "nombre": "Ana Pérez",
+        "correo": "ana@example.com"
+      },
+      "tecnico": {
+        "nombre": "Luis Torres",
+        "correo": "luis@example.com"
+      },
+      "estado": "EN_PROCESO",
+      "fechaCreacion": "2026-11-21T01:21:17.710789151Z"
+    },
+    "location": null
+  },
+  {
+    "nombre": "Rechazar título vacío y correo inválido",
+    "metodo": "POST",
+    "url": "http://127.0.0.1:8080/api/solicitudes",
+    "estado": 400,
+    "respuesta": {
+      "estado": 400,
+      "mensaje": "Revise los campos indicados",
+      "campos": {
+        "cliente.correo": "Ingrese un correo válido",
+        "titulo": "El título es obligatorio"
+      }
+    },
+    "location": null
+  },
+  {
+    "nombre": "Rechazar estado desconocido",
+    "metodo": "PUT",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 400,
+    "respuesta": {
+      "estado": 400,
+      "mensaje": "Envíe un JSON válido con los tipos y valores de estado documentados",
+      "campos": {}
+    },
+    "location": null
+  },
+  {
+    "nombre": "Eliminar solicitud",
+    "metodo": "DELETE",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 204,
+    "respuesta": null,
+    "location": null
+  },
+  {
+    "nombre": "Consultar solicitud eliminada",
+    "metodo": "GET",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 404,
+    "respuesta": {
+      "estado": 404,
+      "mensaje": "No existe una solicitud con ID 1",
+      "campos": {}
+    },
+    "location": null
+  },
+  {
+    "nombre": "Actualizar solicitud eliminada",
+    "metodo": "PUT",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 404,
+    "respuesta": {
+      "estado": 404,
+      "mensaje": "No existe una solicitud con ID 1",
+      "campos": {}
+    },
+    "location": null
+  },
+  {
+    "nombre": "Eliminar solicitud ya eliminada",
+    "metodo": "DELETE",
+    "url": "http://127.0.0.1:8080/api/solicitudes/1",
+    "estado": 404,
+    "respuesta": {
+      "estado": 404,
+      "mensaje": "No existe una solicitud con ID 1",
+      "campos": {}
+    },
+    "location": null
+  },
+  {
+    "nombre": "Rechazar identificador no numérico",
+    "metodo": "GET",
+    "url": "http://127.0.0.1:8080/api/solicitudes/abc",
+    "estado": 400,
+    "respuesta": {
+      "estado": 400,
+      "mensaje": "El identificador debe ser un número entero",
+      "campos": {}
+    },
+    "location": null
+  }
+]

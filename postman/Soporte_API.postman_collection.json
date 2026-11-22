@@ -1,0 +1,336 @@
+{
+  "info": {
+    "name": "API de solicitudes de soporte técnico",
+    "description": "Ejecutar en orden. La primera prueba obtiene el ID que usan las siguientes.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "solicitudId",
+      "value": ""
+    },
+    {
+      "key": "fechaCreacion",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Registrar solicitud",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Impresora sin conexión\",\n  \"descripcion\": \"El equipo de recepción no puede imprimir desde esta mañana.\",\n  \"cliente\": {\n    \"nombre\": \"Ana Pérez\",\n    \"correo\": \"ana@example.com\"\n  },\n  \"estado\": \"PENDIENTE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) {",
+              "    const solicitud = pm.response.json();",
+              "    pm.collectionVariables.set(\"solicitudId\", String(solicitud.id));",
+              "    pm.collectionVariables.set(\"fechaCreacion\", solicitud.fechaCreacion);",
+              "    pm.test(\"Devuelve ID, estado y encabezado Location\", () => {",
+              "        pm.expect(solicitud.id).to.be.a(\"number\");",
+              "        pm.expect(solicitud.estado).to.equal(\"PENDIENTE\");",
+              "        pm.expect(solicitud.tecnico).to.equal(null);",
+              "        pm.expect(pm.response.headers.get(\"Location\")).to.include(\"/api/solicitudes/\" + solicitud.id);",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listar solicitudes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"La lista contiene la solicitud creada\", () => {",
+              "    const id = Number(pm.collectionVariables.get(\"solicitudId\"));",
+              "    pm.expect(pm.response.json().some(item => item.id === id)).to.equal(true);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Coincide el ID\", () => {",
+              "    pm.expect(pm.response.json().id).to.equal(Number(pm.collectionVariables.get(\"solicitudId\")));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actualizar y asignar técnico",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Impresora sin conexión\",\n  \"descripcion\": \"El equipo de recepción no puede imprimir desde esta mañana.\",\n  \"cliente\": {\n    \"nombre\": \"Ana Pérez\",\n    \"correo\": \"ana@example.com\"\n  },\n  \"estado\": \"EN_PROCESO\",\n  \"tecnico\": {\n    \"nombre\": \"Luis Torres\",\n    \"correo\": \"luis@example.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Actualiza el estado y conserva ID y fecha\", () => {",
+              "    const solicitud = pm.response.json();",
+              "    pm.expect(solicitud.estado).to.equal(\"EN_PROCESO\");",
+              "    pm.expect(solicitud.tecnico.correo).to.equal(\"luis@example.com\");",
+              "    pm.expect(solicitud.id).to.equal(Number(pm.collectionVariables.get(\"solicitudId\")));",
+              "    pm.expect(solicitud.fechaCreacion).to.equal(pm.collectionVariables.get(\"fechaCreacion\"));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar título vacío y correo inválido",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \" \",\n  \"descripcion\": \"El equipo de recepción no puede imprimir desde esta mañana.\",\n  \"cliente\": {\n    \"nombre\": \"Ana Pérez\",\n    \"correo\": \"incorrecto\"\n  },\n  \"estado\": \"PENDIENTE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Identifica ambos campos inválidos\", () => {",
+              "    pm.expect(pm.response.json().campos).to.have.property(\"titulo\");",
+              "    pm.expect(pm.response.json().campos).to.have.property(\"cliente.correo\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar estado desconocido",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Impresora sin conexión\",\n  \"descripcion\": \"El equipo de recepción no puede imprimir desde esta mañana.\",\n  \"cliente\": {\n    \"nombre\": \"Ana Pérez\",\n    \"correo\": \"ana@example.com\"\n  },\n  \"estado\": \"OTRO\",\n  \"tecnico\": {\n    \"nombre\": \"Luis Torres\",\n    \"correo\": \"luis@example.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"La respuesta tiene un mensaje\", () => pm.expect(pm.response.json().mensaje).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eliminar solicitud",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 204\", () => pm.response.to.have.status(204));",
+              "pm.test(\"La respuesta no tiene cuerpo\", () => pm.expect(pm.response.text()).to.equal(\"\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultar solicitud eliminada",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"El error identifica el ID\", () => {",
+              "    pm.expect(pm.response.json().mensaje).to.include(pm.collectionVariables.get(\"solicitudId\"));",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actualizar solicitud eliminada",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Impresora sin conexión\",\n  \"descripcion\": \"El equipo de recepción no puede imprimir desde esta mañana.\",\n  \"cliente\": {\n    \"nombre\": \"Ana Pérez\",\n    \"correo\": \"ana@example.com\"\n  },\n  \"estado\": \"EN_PROCESO\",\n  \"tecnico\": {\n    \"nombre\": \"Luis Torres\",\n    \"correo\": \"luis@example.com\"\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Eliminar solicitud ya eliminada",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes/{{solicitudId}}"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 404\", () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rechazar identificador no numérico",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/solicitudes/abc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 400\", () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
